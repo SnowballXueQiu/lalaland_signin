@@ -1,0 +1,11 @@
+packages:
+  - miniprogram
+  - backend
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - '@tarojs/binding'
+  - '@tarojs/cli'
+  - core-js
+  - core-js-pure
+  - esbuild

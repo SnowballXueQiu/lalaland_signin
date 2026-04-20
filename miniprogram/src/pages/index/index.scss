@@ -1,0 +1,77 @@
+.login-page {
+  min-height: 100vh;
+  padding: 90rpx 30rpx 160rpx 30rpx;
+  box-sizing: border-box;
+  background-color: #fff6ef;
+  background-image:
+    radial-gradient(circle at 12% 16%, rgba(255, 92, 168, 0.85) 0 18%, rgba(255, 92, 168, 0) 19%),
+    radial-gradient(circle at 86% 18%, rgba(0, 216, 255, 0.75) 0 16%, rgba(0, 216, 255, 0) 17%),
+    radial-gradient(circle at 32% 82%, rgba(255, 214, 64, 0.85) 0 18%, rgba(255, 214, 64, 0) 19%),
+    linear-gradient(135deg, rgba(29, 27, 49, 0.10) 25%, rgba(29, 27, 49, 0) 25% 50%, rgba(29, 27, 49, 0.10) 50% 75%, rgba(29, 27, 49, 0) 75%);
+  background-size: auto, auto, auto, 36rpx 36rpx;
+}
+
+.login-hero {
+  padding: 0 10rpx;
+  margin-bottom: 50rpx;
+}
+
+.login-title {
+  font-size: 56rpx;
+  font-weight: 900;
+  color: #1d1b31;
+  line-height: 1.2;
+  letter-spacing: 2rpx;
+}
+
+.login-subtitle {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: rgba(29, 27, 49, 0.85);
+}
+
+.music-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+  margin-top: 22rpx;
+}
+
+.music-chip {
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  border: 4rpx solid #1d1b31;
+  box-shadow: 6rpx 6rpx 0 #1d1b31;
+  font-size: 24rpx;
+  font-weight: 900;
+  color: #1d1b31;
+  background: #fff;
+}
+
+.music-chip-pink {
+  background: #ff5ca8;
+  color: #fff;
+}
+
+.music-chip-blue {
+  background: #00d8ff;
+}
+
+.music-chip-yellow {
+  background: #ffd640;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 36rpx 30rpx;
+  box-shadow: 10rpx 10rpx 0 rgba(29, 27, 49, 1);
+  border: 4rpx solid rgba(29, 27, 49, 1);
+}
+
+.admin-entry {
+  position: fixed;
+  right: 24rpx;
+  bottom: 24rpx;
+  z-index: 1000;
+}

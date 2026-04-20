@@ -1,0 +1,43 @@
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node
+node_modules/
+dist/
+.temp/
+.cache/
+.swc/
+*.local
+
+# Taro / WeChat miniprogram
+miniprogram/dist/
+miniprogram/deploy_versions/
+miniprogram/.temp/
+miniprogram/.rn_temp/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.python-version
+
+# Backend runtime data
+backend/app.db
+
+# Secrets / local config
+backend/config.toml
+backend/config.local.toml
+*.env
+*.env.*
+
+# UV
+backend/.uv/

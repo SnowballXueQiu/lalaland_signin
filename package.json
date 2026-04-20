@@ -1,0 +1,10 @@
+{
+  "name": "lalaland_signin",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd backend && uv run python main.py",
+    "build": "pnpm --filter miniprogram build:weapp",
+    "postinstall": "cd backend && uv sync"
+  }
+}

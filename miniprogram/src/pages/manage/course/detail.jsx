@@ -1,0 +1,338 @@
+import React, { useState, useEffect } from 'react'
+import { View, Text, Switch, ScrollView } from '@tarojs/components'
+import { AtButton, AtTag, AtActionSheet, AtActionSheetItem, AtCalendar, AtCheckbox } from 'taro-ui'
+import Taro, { getCurrentInstance, useShareAppMessage, useShareTimeline } from '@tarojs/taro'
+import { request } from '../../../utils/api'
+
+export default function CourseDetail() {
+  const [courseId, setCourseId] = useState(null)
+  const [course, setCourse] = useState(null)
+  const [allStudents, setAllStudents] = useState([])
+  const [studentPickerOpen, setStudentPickerOpen] = useState(false)
+  const [studentFilterGroup, setStudentFilterGroup] = useState('全部')
+  const [selectedStudentIds, setSelectedStudentIds] = useState([])
+  
+  // checkin mode
+  const [isCheckinMode, setIsCheckinMode] = useState(false)
+  const [attendDate, setAttendDate] = useState(() => {
+    const today = new Date()
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  })
+  
+  const [attendanceList, setAttendanceList] = useState([])
+  const [attendDateOpen, setAttendDateOpen] = useState(false)
+
+  useShareAppMessage(() => {
+    return {
+      title: course ? `${course.name} - 课程详情` : '课程详情',
+      path: `/pages/manage/course/detail?id=${courseId}`
+    }
+  })
+
+  useShareTimeline(() => {
+    return {
+      title: course ? `${course.name} - 课程详情` : '课程详情',
+      query: `id=${courseId}`
+    }
+  })
+
+  const fetchCourseDetail = async (id) => {
+    try {
+      const data = await request(`/course/detail?course_id=${id}`)
+      setCourse(data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const fetchAllStudents = async () => {
+    try {
+      const data = await request('/student/list')
+      setAllStudents(data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  
+  const fetchAttendanceList = async (id, dateStr) => {
+    try {
+      const data = await request(`/attendance/list?course_id=${id}&attend_date=${dateStr}`)
+      setAttendanceList(data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  useEffect(() => {
+    const instance = getCurrentInstance()
+    const id = instance.router.params.id
+    if (id) {
+      setCourseId(id)
+      fetchCourseDetail(id)
+      fetchAllStudents()
+      fetchAttendanceList(id, attendDate)
+    }
+  }, [])
+  
+  useEffect(() => {
+    if (courseId && attendDate) {
+      fetchAttendanceList(courseId, attendDate)
+    }
+  }, [attendDate, courseId])
+
+  const handleAddStudent = async () => {
+    try {
+      if (!selectedStudentIds.length) {
+        Taro.showToast({ title: '请选择学生', icon: 'none' })
+        return
+      }
+      const toAdd = selectedStudentIds.filter(id => !enrolledIds.has(id))
+      if (!toAdd.length) {
+        Taro.showToast({ title: '所选学生已在课程中', icon: 'none' })
+        return
+      }
+      await Promise.all(
+        toAdd.map(studentId =>
+          request('/course/addStudent', 'POST', {
+            student_id: studentId,
+            course_id: parseInt(courseId, 10)
+          })
+        )
+      )
+      Taro.showToast({ title: '添加成功', icon: 'success' })
+      setSelectedStudentIds([])
+      setStudentFilterGroup('全部')
+      setStudentPickerOpen(false)
+      fetchCourseDetail(courseId)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleRemoveStudent = async (studentId) => {
+    Taro.showModal({
+      title: '确认',
+      content: '确定要移除该学生吗？',
+      success: async function (res) {
+        if (res.confirm) {
+          try {
+            await request('/course/removeStudent', 'POST', {
+              student_id: studentId,
+              course_id: parseInt(courseId, 10)
+            })
+            Taro.showToast({ title: '移除成功', icon: 'success' })
+            fetchCourseDetail(courseId)
+          } catch (e) {
+            console.error(e)
+          }
+        }
+      }
+    })
+  }
+
+  const toggleAttendance = async (studentId, isChecked) => {
+    try {
+      if (isChecked) {
+        await request('/attendance/checkin', 'POST', {
+          student_id: studentId,
+          course_id: parseInt(courseId, 10),
+          attend_date: attendDate
+        })
+      } else {
+        await request('/attendance/delete', 'POST', {
+          student_id: studentId,
+          course_id: parseInt(courseId, 10),
+          attend_date: attendDate
+        })
+      }
+      // Refresh course detail for updated used_lessons and attendance list
+      fetchCourseDetail(courseId)
+      fetchAttendanceList(courseId, attendDate)
+      Taro.showToast({ title: '操作成功', icon: 'success' })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  if (!course) return <View className='container'><Text>Loading...</Text></View>
+
+  const checkedStudentIds = attendanceList.map(a => a.student_id)
+  const enrolledIds = new Set(course.students.map(s => s.id))
+
+  return (
+    <View className='container' style={{ paddingBottom: '60rpx' }}>
+      <View className='header'>
+        <Text className='title'>{course.name} 详情</Text>
+      </View>
+      
+      <View className='card'>
+        <Text className='card-title'>基本信息</Text>
+        <View className='memphis-kpi'>
+          <View className='memphis-kpi-item'>
+            <Text className='memphis-kpi-label'>所属团</Text>
+            <Text className='memphis-kpi-value'>{course.group_name}</Text>
+          </View>
+          <View className='memphis-kpi-item'>
+            <Text className='memphis-kpi-label'>老师</Text>
+            <Text className='memphis-kpi-value'>{course.teacher || '无'}</Text>
+          </View>
+          <View className='memphis-kpi-item'>
+            <Text className='memphis-kpi-label'>总课时</Text>
+            <Text className='memphis-kpi-value'>{course.total_lessons}</Text>
+          </View>
+        </View>
+      </View>
+
+      <View className='card'>
+        <View className='memphis-row'>
+          <Text style={{ fontSize: '32rpx', fontWeight: 900, color: '#1d1b31' }}>学生名单 ({course.students.length}人)</Text>
+          <View style={{ display: 'flex', alignItems: 'center' }}>
+            <Text className='memphis-subtitle' style={{ marginRight: '12rpx' }}>签到模式</Text>
+            <Switch checked={isCheckinMode} onChange={e => setIsCheckinMode(e.detail.value)} color='#ff5ca8' />
+          </View>
+        </View>
+        
+        {isCheckinMode && (
+          <View className='memphis-form' style={{ paddingBottom: '20rpx' }}>
+            <View
+              className='memphis-picker-row'
+              hoverClass='memphis-picker-row--hover'
+              onClick={() => setAttendDateOpen(true)}
+            >
+              <Text className='memphis-picker-title'>签到日期</Text>
+              <Text className='memphis-picker-value'>{attendDate}</Text>
+            </View>
+          </View>
+        )}
+
+        {course.students.length === 0 && <Text className='empty-text'>暂无学生</Text>}
+        
+        {course.students.map(s => {
+          const isChecked = checkedStudentIds.includes(s.id)
+          const remaining = course.total_lessons - s.used_lessons
+          return (
+            <View key={s.id} className='memphis-row memphis-divider'>
+              <View>
+                <View>
+                  <Text style={{ fontWeight: 900, fontSize: '30rpx', color: '#1d1b31' }}>{s.name}</Text>
+                  <Text style={{ fontSize: '26rpx', color: 'rgba(29,27,49,0.55)', marginLeft: '10rpx' }}>({s.student_no})</Text>
+                </View>
+                <View style={{ fontSize: '24rpx', color: 'rgba(29,27,49,0.72)', marginTop: '10rpx' }}>
+                  已上 <Text style={{ fontWeight: 900 }}>{s.used_lessons}</Text> · 剩余 <Text style={{ fontWeight: 900 }}>{remaining}</Text>
+                </View>
+              </View>
+              <View>
+                {isCheckinMode ? (
+                  <AtTag 
+                    type='primary' 
+                    active={isChecked}
+                    onClick={() => toggleAttendance(s.id, !isChecked)}
+                  >
+                    {isChecked ? '已签到' : '未签到'}
+                  </AtTag>
+                ) : (
+                  <Text className='memphis-danger' style={{ fontSize: '28rpx', padding: '10rpx' }} onClick={() => handleRemoveStudent(s.id)}>移除</Text>
+                )}
+              </View>
+            </View>
+          )
+        })}
+        
+        {!isCheckinMode && (
+          <View style={{ marginTop: '20px' }}>
+            <View className='memphis-form'>
+              <View
+                className='memphis-picker-row'
+                hoverClass='memphis-picker-row--hover'
+                onClick={() => setStudentPickerOpen(true)}
+              >
+                <Text className='memphis-picker-title'>选择学生</Text>
+                <Text className='memphis-picker-value'>
+                  {selectedStudentIds.length ? `已选${selectedStudentIds.length}人` : '请选择'}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+      </View>
+
+      <AtActionSheet
+        isOpened={attendDateOpen}
+        title='选择签到日期'
+        cancelText='关闭'
+        onClose={() => setAttendDateOpen(false)}
+        onCancel={() => setAttendDateOpen(false)}
+      >
+        <View style={{ padding: '0 20rpx 10rpx 20rpx' }}>
+          <AtCalendar
+            isSwiper={true}
+            minDate={course.start_date || '1970-01-01'}
+            onSelectDate={(e) => {
+              const dateStr = e?.value?.start
+              if (dateStr) {
+                setAttendDate(dateStr)
+              }
+              setAttendDateOpen(false)
+            }}
+          />
+        </View>
+      </AtActionSheet>
+
+      <AtActionSheet
+        isOpened={studentPickerOpen}
+        title='选择学生'
+        cancelText='关闭'
+        onClose={() => setStudentPickerOpen(false)}
+        onCancel={() => setStudentPickerOpen(false)}
+      >
+        <View style={{ padding: '0 20rpx 20rpx 20rpx' }}>
+          <ScrollView scrollX style={{ whiteSpace: 'nowrap', padding: '12rpx 0' }}>
+            <View style={{ display: 'flex', gap: '12rpx' }}>
+              <AtTag
+                type='primary'
+                active={studentFilterGroup === '全部'}
+                onClick={() => setStudentFilterGroup('全部')}
+              >
+                全部
+              </AtTag>
+              {[...new Set(allStudents.map(s => s.group_name || '未分组'))].map(g => (
+                <AtTag
+                  key={g}
+                  type='primary'
+                  active={studentFilterGroup === g}
+                  onClick={() => setStudentFilterGroup(g)}
+                >
+                  {g}
+                </AtTag>
+              ))}
+            </View>
+          </ScrollView>
+
+          <ScrollView scrollY style={{ height: '900rpx' }}>
+            <AtCheckbox
+              options={allStudents
+                .filter(s => {
+                  const g = s.group_name || '未分组'
+                  return studentFilterGroup === '全部' ? true : g === studentFilterGroup
+                })
+                .map(s => ({
+                  value: s.id,
+                  label: `${s.name} (${s.student_no})`,
+                  desc: s.group_name || '未分组',
+                  disabled: enrolledIds.has(s.id)
+                }))}
+              selectedList={selectedStudentIds}
+              onChange={(list) => setSelectedStudentIds(list)}
+            />
+          </ScrollView>
+
+          <View style={{ marginTop: '18rpx' }}>
+            <AtButton type='primary' onClick={handleAddStudent}>
+              确认添加 ({selectedStudentIds.length})
+            </AtButton>
+          </View>
+        </View>
+      </AtActionSheet>
+    </View>
+  )
+}

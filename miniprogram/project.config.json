@@ -1,0 +1,15 @@
+{
+  "miniprogramRoot": "./dist",
+  "projectname": "miniprogram",
+  "description": "La La Land",
+  "appid": "wx0d1d96faf0edfc02",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": true
+  },
+  "compileType": "miniprogram"
+}
