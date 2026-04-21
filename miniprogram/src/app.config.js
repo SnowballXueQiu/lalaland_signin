@@ -7,6 +7,7 @@ export default defineAppConfig({
     'pages/manage/course/detail',
     'pages/parent/index'
   ],
+  lazyCodeLoading: 'requiredComponents',
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#fff',
