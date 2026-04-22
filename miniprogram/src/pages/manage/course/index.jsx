@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text } from '@tarojs/components'
-import { AtInput, AtButton, AtList, AtListItem, AtActionSheet, AtActionSheetItem, AtCalendar, AtSwipeAction } from 'taro-ui'
+import { AtInput, AtButton, AtActionSheet, AtActionSheetItem, AtCalendar } from 'taro-ui'
 import Taro, { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { request } from '../../../utils/api'
 
@@ -175,33 +175,34 @@ export default function CourseManage() {
       <View className='card'>
         <Text className='card-title'>课程列表</Text>
         {courses.length === 0 && <Text className='empty-text'>暂无课程数据</Text>}
-        <AtList>
+        <View className='memphis-course-list'>
           {courses.map(c => (
-            <AtSwipeAction
+            <View
               key={c.id}
-              autoClose
-              options={[
-                {
-                  text: '删除',
-                  style: {
-                    backgroundColor: '#ff5ca8',
-                    color: '#fff',
-                    fontWeight: 900
-                  }
-                }
-              ]}
-              onClick={() => handleDeleteCourse(c)}
+              className='memphis-course-row'
+              onClick={() => Taro.navigateTo({ url: `/pages/manage/course/detail?id=${c.id}` })}
             >
-              <AtListItem 
-                title={c.name}
-                note={`团: ${c.group_name} | 老师: ${c.teacher || '无'}`}
-                extraText={`课时: ${c.total_lessons}`}
-                arrow='right'
-                onClick={() => Taro.navigateTo({ url: `/pages/manage/course/detail?id=${c.id}` })}
-              />
-            </AtSwipeAction>
+              <View className='memphis-course-main'>
+                <View className='memphis-course-top'>
+                  <Text className='memphis-course-title'>{c.name}</Text>
+                </View>
+                <Text className='memphis-course-note'>团: {c.group_name} | 老师: {c.teacher || '无'} | 课时: {c.total_lessons}</Text>
+              </View>
+              <View className='memphis-course-actions'>
+                <AtButton
+                  size='small'
+                  type='secondary'
+                  onClick={(e) => {
+                    e?.stopPropagation?.()
+                    handleDeleteCourse(c)
+                  }}
+                >
+                  删除
+                </AtButton>
+              </View>
+            </View>
           ))}
-        </AtList>
+        </View>
       </View>
     </View>
   )

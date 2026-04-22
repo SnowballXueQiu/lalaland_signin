@@ -431,3 +431,59 @@ page {
   font-weight: 900 !important;
   color: rgba(29, 27, 49, 0.55) !important;
 }
+
+.memphis-course-list {
+  background: transparent;
+}
+
+.memphis-course-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 22rpx 30rpx;
+  background: #fff;
+  border-top: 2rpx solid rgba(29, 27, 49, 0.08);
+  box-sizing: border-box;
+}
+
+.memphis-course-row:first-child {
+  border-top: 0;
+}
+
+.memphis-course-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.memphis-course-top {
+  display: flex;
+  align-items: baseline;
+}
+
+.memphis-course-title {
+  font-size: 32rpx;
+  font-weight: 900;
+  color: #1d1b31;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memphis-course-extra {
+  font-size: 28rpx;
+  font-weight: 900;
+  color: rgba(29, 27, 49, 0.55);
+  flex: 0 0 auto;
+}
+
+.memphis-course-note {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: rgba(29, 27, 49, 0.55);
+  font-weight: 900;
+}
+
+.memphis-course-actions {
+  flex: 0 0 auto;
+}
