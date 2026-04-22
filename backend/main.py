@@ -77,6 +77,9 @@ class CourseCreate(BaseModel):
     start_date: Optional[date] = None
     total_lessons: int = 20
 
+class CourseDelete(BaseModel):
+    course_id: int
+
 class EnrollmentCreate(BaseModel):
     student_id: int
     course_id: int
@@ -246,6 +249,25 @@ def list_courses():
     courses = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return courses
+
+@app.post("/course/delete")
+def delete_course(payload: CourseDelete):
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        conn.execute("BEGIN")
+        cursor.execute("DELETE FROM attendance WHERE course_id = ?", (payload.course_id,))
+        cursor.execute("DELETE FROM enrollment WHERE course_id = ?", (payload.course_id,))
+        cursor.execute("DELETE FROM course WHERE id = ?", (payload.course_id,))
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Course not found")
+        conn.commit()
+        return {"message": "Course deleted successfully"}
+    except HTTPException:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 @app.get("/course/detail")
 def course_detail(course_id: int):

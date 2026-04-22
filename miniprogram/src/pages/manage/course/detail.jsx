@@ -185,7 +185,12 @@ export default function CourseDetail() {
       </View>
       
       <View className='card'>
-        <Text className='card-title'>基本信息</Text>
+        <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 30rpx', marginBottom: '20rpx' }}>
+          <Text className='card-title' style={{ padding: 0, marginBottom: 0 }}>基本信息</Text>
+          <Text style={{ fontSize: '26rpx', fontWeight: 900, color: 'rgba(29,27,49,0.55)' }}>
+            开课：{course.start_date || '未设置'}
+          </Text>
+        </View>
         <View className='memphis-kpi'>
           <View className='memphis-kpi-item'>
             <Text className='memphis-kpi-label'>所属团</Text>

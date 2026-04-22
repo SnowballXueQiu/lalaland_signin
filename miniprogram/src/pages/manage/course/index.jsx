@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text } from '@tarojs/components'
-import { AtInput, AtButton, AtList, AtListItem, AtActionSheet, AtActionSheetItem, AtCalendar } from 'taro-ui'
+import { AtInput, AtButton, AtList, AtListItem, AtActionSheet, AtActionSheetItem, AtCalendar, AtSwipeAction } from 'taro-ui'
 import Taro, { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { request } from '../../../utils/api'
 
@@ -54,6 +54,25 @@ export default function CourseManage() {
     } catch (e) {
       console.error(e)
     }
+  }
+
+  const handleDeleteCourse = async (course) => {
+    Taro.showModal({
+      title: '删除课程',
+      content: `确定删除「${course.name}」吗？删除后将同时清除该课程的学生报名与签到记录。`,
+      confirmText: '删除',
+      cancelText: '取消',
+      success: async (res) => {
+        if (!res.confirm) return
+        try {
+          await request('/course/delete', 'POST', { course_id: course.id })
+          Taro.showToast({ title: '删除成功', icon: 'success' })
+          fetchCourses()
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    })
   }
 
   return (
@@ -158,14 +177,29 @@ export default function CourseManage() {
         {courses.length === 0 && <Text className='empty-text'>暂无课程数据</Text>}
         <AtList>
           {courses.map(c => (
-            <AtListItem 
-              key={c.id} 
-              title={c.name}
-              note={`团: ${c.group_name} | 老师: ${c.teacher || '无'}`}
-              extraText={`课时: ${c.total_lessons}`}
-              arrow='right'
-              onClick={() => Taro.navigateTo({ url: `/pages/manage/course/detail?id=${c.id}` })}
-            />
+            <AtSwipeAction
+              key={c.id}
+              autoClose
+              options={[
+                {
+                  text: '删除',
+                  style: {
+                    backgroundColor: '#ff5ca8',
+                    color: '#fff',
+                    fontWeight: 900
+                  }
+                }
+              ]}
+              onClick={() => handleDeleteCourse(c)}
+            >
+              <AtListItem 
+                title={c.name}
+                note={`团: ${c.group_name} | 老师: ${c.teacher || '无'}`}
+                extraText={`课时: ${c.total_lessons}`}
+                arrow='right'
+                onClick={() => Taro.navigateTo({ url: `/pages/manage/course/detail?id=${c.id}` })}
+              />
+            </AtSwipeAction>
           ))}
         </AtList>
       </View>
