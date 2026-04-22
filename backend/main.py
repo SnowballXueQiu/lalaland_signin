@@ -97,6 +97,7 @@ class ParentUnbind(BaseModel):
 
 class LoginRequest(BaseModel):
     code: str
+    mock_openid: Optional[str] = None
 
 class AdminPasswordLoginRequest(BaseModel):
     password: str
@@ -113,8 +114,12 @@ async def wechat_login(req: LoginRequest):
             if not openid:
                 raise HTTPException(status_code=400, detail="Failed to get openid from WeChat")
     else:
-        # Mock mode for local dev if appid/secret not set
-        openid = f"mock_{req.code}"
+        if req.mock_openid and re.fullmatch(r"[A-Za-z0-9_\-]{6,64}", req.mock_openid):
+            openid = req.mock_openid
+        elif req.code == "admin_code":
+            openid = "mock_admin"
+        else:
+            openid = "mock_parent"
         
     conn = get_db()
     cursor = conn.cursor()

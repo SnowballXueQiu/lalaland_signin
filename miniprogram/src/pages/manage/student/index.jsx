@@ -4,7 +4,7 @@ import { AtInput, AtButton, AtList, AtListItem, AtAccordion, AtActionSheet, AtAc
 import Taro, { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { request } from '../../../utils/api'
 
-const GROUPS = ['少年团', '女声团', '混声团', 'Dreamers', '童声2团', '童声3团', '启蒙1团', '启蒙2团', '启蒙3团', '启蒙4团', '启蒙5团', '启蒙六团']
+const GROUPS = ['少年团', '女声团', '混声团', 'Dreamers', '童声2团', '童声3团', '启蒙1团', '启蒙2团', '启蒙3团', '启蒙4团', '启蒙5团', '启蒙6团']
 
 export default function StudentManage() {
   const [students, setStudents] = useState([])

@@ -158,6 +158,25 @@ export default function CourseDetail() {
 
   const checkedStudentIds = attendanceList.map(a => a.student_id)
   const enrolledIds = new Set(course.students.map(s => s.id))
+  const filteredStudents = allStudents.filter(s => {
+    const g = s.group_name || '未分组'
+    return studentFilterGroup === '全部' ? true : g === studentFilterGroup
+  })
+  const selectableStudentIds = filteredStudents.filter(s => !enrolledIds.has(s.id)).map(s => s.id)
+  const selectedStudentIdSet = new Set(selectedStudentIds)
+  const hasAllSelectableInFilter = selectableStudentIds.length > 0 && selectableStudentIds.every(id => selectedStudentIdSet.has(id))
+
+  const toggleSelectAllInFilter = () => {
+    if (!selectableStudentIds.length) return
+    if (hasAllSelectableInFilter) {
+      const removeSet = new Set(selectableStudentIds)
+      setSelectedStudentIds(prev => prev.filter(id => !removeSet.has(id)))
+      return
+    }
+    const next = new Set(selectedStudentIds)
+    selectableStudentIds.forEach(id => next.add(id))
+    setSelectedStudentIds(Array.from(next))
+  }
 
   return (
     <View className='container' style={{ paddingBottom: '60rpx' }}>
@@ -282,6 +301,7 @@ export default function CourseDetail() {
         isOpened={studentPickerOpen}
         title='选择学生'
         cancelText='关闭'
+        className='memphis-action-sheet'
         onClose={() => setStudentPickerOpen(false)}
         onCancel={() => setStudentPickerOpen(false)}
       >
@@ -308,19 +328,31 @@ export default function CourseDetail() {
             </View>
           </ScrollView>
 
+          <View className='memphis-filter-row'>
+            <Text className='memphis-filter-left'>
+              当前分类：{studentFilterGroup}
+            </Text>
+            <View className='memphis-filter-right'>
+              <AtButton
+                size='small'
+                type='secondary'
+                disabled={!selectableStudentIds.length}
+                onClick={toggleSelectAllInFilter}
+                customStyle={{ display: 'inline-flex', width: 'auto' }}
+              >
+                {hasAllSelectableInFilter ? '取消全选' : '全选'}
+              </AtButton>
+            </View>
+          </View>
+
           <ScrollView scrollY style={{ height: '900rpx' }}>
             <AtCheckbox
-              options={allStudents
-                .filter(s => {
-                  const g = s.group_name || '未分组'
-                  return studentFilterGroup === '全部' ? true : g === studentFilterGroup
-                })
-                .map(s => ({
-                  value: s.id,
-                  label: `${s.name} (${s.student_no})`,
-                  desc: s.group_name || '未分组',
-                  disabled: enrolledIds.has(s.id)
-                }))}
+              options={filteredStudents.map(s => ({
+                value: s.id,
+                label: `${s.name} (${s.student_no})`,
+                desc: s.group_name || '未分组',
+                disabled: enrolledIds.has(s.id)
+              }))}
               selectedList={selectedStudentIds}
               onChange={(list) => setSelectedStudentIds(list)}
             />

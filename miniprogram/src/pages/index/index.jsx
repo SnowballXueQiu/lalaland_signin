@@ -30,6 +30,11 @@ export default function Index() {
       // In a real WeChat environment, this gets the actual code.
       // In H5/web, this will fail unless polyfilled, so we simulate it if we are not in weapp
       let code = "admin_code" // For local testing, use 'admin_code' to simulate admin, 'parent_code' for parent
+      let mockOpenid = Taro.getStorageSync('mock_openid')
+      if (!mockOpenid) {
+        mockOpenid = `mock_${Date.now()}_${Math.random().toString(16).slice(2, 10)}`
+        Taro.setStorageSync('mock_openid', mockOpenid)
+      }
       
       if (Taro.getEnv() === Taro.ENV_TYPE.WEAPP) {
         const loginRes = await Taro.login()
@@ -40,7 +45,7 @@ export default function Index() {
         }
       }
 
-      const res = await request('/auth/login', 'POST', { code })
+      const res = await request('/auth/login', 'POST', { code, mock_openid: mockOpenid })
       Taro.setStorageSync('openid', res.openid)
       Taro.setStorageSync('role', res.role)
 
@@ -78,15 +83,18 @@ export default function Index() {
     }
   }
 
+  const closeAdminModal = () => {
+    setAdminModalOpen(false)
+    setAdminPassword('')
+  }
+
   return (
     <View className='login-page'>
       <View className='login-hero'>
         <Text className='login-title'>爱乐之城</Text>
-        <Text className='login-subtitle'>课时统计面板</Text>
+        <Text className='login-subtitle'>排练次数统计面板</Text>
         <View className='music-chips'>
-          <Text className='music-chip music-chip-pink'>声乐</Text>
           <Text className='music-chip music-chip-blue'>合唱</Text>
-          <Text className='music-chip music-chip-yellow'>音乐</Text>
         </View>
       </View>
       <View className='login-card'>
@@ -106,23 +114,25 @@ export default function Index() {
         </AtButton>
       </View>
 
-      <AtModal isOpened={adminModalOpen} onClose={() => setAdminModalOpen(false)}>
-        <AtModalHeader>管理员登录</AtModalHeader>
-        <AtModalContent>
-          <AtInput
-            name='admin_password'
-            title='密码'
-            type='password'
-            placeholder='请输入超管密码'
-            value={adminPassword}
-            onChange={(v) => setAdminPassword(v)}
-          />
-        </AtModalContent>
-        <AtModalAction>
-          <AtButton type='secondary' onClick={() => setAdminModalOpen(false)}>取消</AtButton>
-          <AtButton type='primary' loading={adminLoading} onClick={handleAdminLogin}>确定</AtButton>
-        </AtModalAction>
-      </AtModal>
+      {adminModalOpen ? (
+        <AtModal isOpened onClose={closeAdminModal}>
+          <AtModalHeader>管理员登录</AtModalHeader>
+          <AtModalContent>
+            <AtInput
+              name='admin_password'
+              title='密码'
+              type='password'
+              placeholder='请输入超管密码'
+              value={adminPassword}
+              onChange={(v) => setAdminPassword(v)}
+            />
+          </AtModalContent>
+          <AtModalAction>
+            <AtButton type='secondary' onClick={closeAdminModal}>取消</AtButton>
+            <AtButton type='primary' loading={adminLoading} onClick={handleAdminLogin}>确定</AtButton>
+          </AtModalAction>
+        </AtModal>
+      ) : null}
     </View>
   )
 }

@@ -363,19 +363,46 @@ page {
   overflow: hidden;
 }
 
-.at-action-sheet__header {
+.at-action-sheet__header,
+.memphis-action-sheet .at-action-sheet__header {
   background: #00d8ff;
   border-bottom: 4rpx solid #1d1b31;
+  color: #fff !important;
+  font-weight: 900 !important;
+  letter-spacing: 2rpx;
+  text-shadow: 2rpx 2rpx 0 #1d1b31;
 }
 
 .at-action-sheet__title {
-  color: #1d1b31;
-  font-weight: 900;
-  letter-spacing: 2rpx;
+  color: inherit !important;
+  font-weight: inherit !important;
 }
 
 .at-action-sheet__body {
   background: #fff;
+}
+
+.memphis-action-sheet .at-action-sheet__body {
+  text-align: left !important;
+}
+
+.memphis-filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10rpx 0 14rpx 0;
+}
+
+.memphis-filter-left {
+  font-size: 26rpx;
+  color: rgba(29, 27, 49, 0.75);
+  font-weight: 700;
+}
+
+.memphis-filter-right {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .at-action-sheet__footer {

@@ -334,8 +334,8 @@ INSERT INTO student (student_no, name, group_name) VALUES ('260567', '王澍艺'
 INSERT INTO student (student_no, name, group_name) VALUES ('260581', '张靖瑶', '启蒙5团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
 INSERT INTO student (student_no, name, group_name) VALUES ('250369', '潘茁', '启蒙5团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
 INSERT INTO student (student_no, name, group_name) VALUES ('250371', '杨惜婷', '启蒙5团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
-INSERT INTO student (student_no, name, group_name) VALUES ('260590', '许宸语', '启蒙六团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
-INSERT INTO student (student_no, name, group_name) VALUES ('260591', '许雍卓', '启蒙六团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
-INSERT INTO student (student_no, name, group_name) VALUES ('260580', '孙笑鸿', '启蒙六团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
-INSERT INTO student (student_no, name, group_name) VALUES ('260588', '李宥岐', '启蒙六团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
-INSERT INTO student (student_no, name, group_name) VALUES ('260589', '李宥麟', '启蒙六团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
+INSERT INTO student (student_no, name, group_name) VALUES ('260590', '许宸语', '启蒙6团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
+INSERT INTO student (student_no, name, group_name) VALUES ('260591', '许雍卓', '启蒙6团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
+INSERT INTO student (student_no, name, group_name) VALUES ('260580', '孙笑鸿', '启蒙6团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
+INSERT INTO student (student_no, name, group_name) VALUES ('260588', '李宥岐', '启蒙6团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
+INSERT INTO student (student_no, name, group_name) VALUES ('260589', '李宥麟', '启蒙6团') ON CONFLICT(student_no) DO UPDATE SET name=excluded.name, group_name=excluded.group_name;
