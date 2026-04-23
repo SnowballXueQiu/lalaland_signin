@@ -106,6 +106,11 @@ export default function Index() {
         >
           微信一键登录
         </AtButton>
+        <View style={{ marginTop: '20rpx' }}>
+          <AtButton type='secondary' circle onClick={() => Taro.navigateTo({ url: '/pages/preview/index' })}>
+            预览体验
+          </AtButton>
+        </View>
       </View>
 
       <View className='admin-entry'>
