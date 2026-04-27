@@ -175,7 +175,7 @@ def export_excel():
         )
         dates = [row["attend_date"] for row in cursor.fetchall()]
 
-        headers = ["学生学号", "姓名"] + dates
+        headers = ["学号", "姓名"] + dates
         ws_course.append(headers)
         style_header(ws_course)
 
