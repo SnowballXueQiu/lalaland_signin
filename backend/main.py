@@ -17,6 +17,11 @@ WX_APPID = os.getenv("WX_APPID", "")
 WX_SECRET = os.getenv("WX_SECRET", "")
 DEFAULT_ADMIN_PASSWORD = "lalaland_admin_2024"
 
+def to_db_date(value: Optional[date]) -> Optional[str]:
+    if value is None:
+        return None
+    return value.isoformat()
+
 def load_admin_password() -> str:
     config_path = os.path.join(os.path.dirname(__file__), "config.toml")
     try:
@@ -247,7 +252,7 @@ def create_course(course: CourseCreate):
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO course (name, group_name, teacher, start_date, total_lessons) VALUES (?, ?, ?, ?, ?)",
-        (course.name, course.group_name, course.teacher, course.start_date, course.total_lessons)
+        (course.name, course.group_name, course.teacher, to_db_date(course.start_date), course.total_lessons)
     )
     conn.commit()
     course_id = cursor.lastrowid
@@ -425,7 +430,7 @@ def checkin(action: AttendanceAction):
         # Insert attendance
         cursor.execute(
             "INSERT INTO attendance (student_id, course_id, attend_date) VALUES (?, ?, ?)",
-            (action.student_id, action.course_id, action.attend_date)
+            (action.student_id, action.course_id, to_db_date(action.attend_date))
         )
         
         # Update enrollment
@@ -456,7 +461,7 @@ def delete_attendance(action: AttendanceAction):
         
         cursor.execute(
             "DELETE FROM attendance WHERE student_id = ? AND course_id = ? AND attend_date = ?",
-            (action.student_id, action.course_id, action.attend_date)
+            (action.student_id, action.course_id, to_db_date(action.attend_date))
         )
         if cursor.rowcount == 0:
             raise Exception("Attendance record not found")
@@ -487,7 +492,7 @@ def list_attendance(course_id: int, attend_date: Optional[date] = None):
     params = [course_id]
     if attend_date:
         query += " AND a.attend_date = ?"
-        params.append(attend_date)
+        params.append(to_db_date(attend_date))
         
     cursor.execute(query, params)
     records = [dict(row) for row in cursor.fetchall()]
