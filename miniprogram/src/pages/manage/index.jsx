@@ -20,6 +20,12 @@ export default function ManageIndex() {
         <Text className='card-title'>快捷入口</Text>
         <AtList hasBorder={false}>
           <AtListItem
+            title='快捷签到'
+            arrow='right'
+            iconInfo={{ size: 20, color: '#ff5ca8', value: 'check-circle' }}
+            onClick={() => Taro.navigateTo({ url: '/pages/manage/checkin/index' })}
+          />
+          <AtListItem
             title='学生管理'
             arrow='right'
             iconInfo={{ size: 20, color: '#2d8cf0', value: 'user' }}
@@ -34,7 +40,7 @@ export default function ManageIndex() {
           <AtListItem
             title='团管理'
             arrow='right'
-            iconInfo={{ size: 20, color: '#ff5ca8', value: 'list' }}
+            iconInfo={{ size: 20, color: '#8a2be2', value: 'list' }}
             onClick={() => Taro.navigateTo({ url: '/pages/manage/group/index' })}
           />
         </AtList>

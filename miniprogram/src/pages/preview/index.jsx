@@ -63,7 +63,6 @@ export default function Preview() {
           <Text>这里是展示的预览页面，无需登录，且不会触发任何授权。</Text>
         </View>
       </View>
-
       <View className='card'>
         <Text className='card-title'>排练列表（示例）</Text>
         <View className='memphis-course-list'>

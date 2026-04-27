@@ -3,6 +3,7 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/preview/index',
     'pages/manage/index',
+    'pages/manage/checkin/index',
     'pages/manage/student/index',
     'pages/manage/course/index',
     'pages/manage/course/detail',

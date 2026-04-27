@@ -66,6 +66,10 @@ export default function CourseDetail() {
   useEffect(() => {
     const instance = getCurrentInstance()
     const id = instance.router.params.id
+    const mode = instance.router.params.mode
+    if (mode === 'checkin') {
+      setIsCheckinMode(true)
+    }
     if (id) {
       setCourseId(id)
       fetchCourseDetail(id)
