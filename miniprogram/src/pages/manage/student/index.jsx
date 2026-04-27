@@ -215,69 +215,61 @@ export default function StudentManage() {
             hasBorder={false}
             isAnimation={false}
           >
-            <AtList hasBorder={false}>
+            <View className='memphis-student-list'>
               {groupedStudents[group].map(s => (
-                <AtSwipeAction
-                  key={s.id}
-                  autoClose
-                  options={[
-                    { text: '编辑', style: { backgroundColor: '#00d8ff', color: '#1d1b31', fontWeight: 900 } },
-                    { text: '删除', style: { backgroundColor: '#ff2d55', color: '#fff', fontWeight: 900 } }
-                  ]}
-                  onClick={(item) => {
-                    if (item.text === '编辑') openEdit(s)
-                    if (item.text === '删除') handleDelete(s)
-                  }}
-                >
-                  <AtListItem
-                    title={s.name}
-                    extraText={s.student_no}
-                    hasBorder
-                    arrow='right'
-                    onClick={() => openEdit(s)}
-                  />
-                </AtSwipeAction>
+                <View key={s.id} className='memphis-student-row'>
+                  <View className='memphis-student-info'>
+                    <Text className='memphis-student-name'>{s.name}</Text>
+                    <Text className='memphis-student-no'>{s.student_no}</Text>
+                  </View>
+                  <View className='memphis-student-actions'>
+                    <View className='memphis-action-btn edit' onClick={() => openEdit(s)}>编辑</View>
+                    <View className='memphis-action-btn delete' onClick={() => handleDelete(s)}>删除</View>
+                  </View>
+                </View>
               ))}
-            </AtList>
+            </View>
           </AtAccordion>
         ))}
       </View>
 
-      <AtModal isOpened={editModalOpen} onClose={() => setEditModalOpen(false)}>
-        <AtModalHeader>编辑学生</AtModalHeader>
-        <AtModalContent>
-          <View className='memphis-form'>
-            <AtInput
-              name='edit_student_no'
-              title='学号'
-              type='text'
-              placeholder='学号'
-              value={editStudent.student_no}
-              onChange={(v) => setEditStudent(prev => ({ ...prev, student_no: v }))}
-            />
-            <AtInput
-              name='edit_name'
-              title='姓名'
-              type='text'
-              placeholder='姓名'
-              value={editStudent.name}
-              onChange={(v) => setEditStudent(prev => ({ ...prev, name: v }))}
-            />
-            <View
-              className='memphis-picker-row'
-              hoverClass='memphis-picker-row--hover'
-              onClick={() => setEditGroupSheetOpen(true)}
-            >
-              <Text className='memphis-picker-title'>所在团</Text>
-              <Text className='memphis-picker-value'>{editStudent.group_name || '请选择'}</Text>
+      {editModalOpen && (
+        <AtModal isOpened={editModalOpen} onClose={() => setEditModalOpen(false)}>
+          <AtModalHeader>编辑学生</AtModalHeader>
+          <AtModalContent>
+            <View className='memphis-form'>
+              <AtInput
+                name='edit_student_no'
+                title='学号'
+                type='text'
+                placeholder='学号'
+                value={editStudent.student_no}
+                onChange={(v) => setEditStudent(prev => ({ ...prev, student_no: v }))}
+              />
+              <AtInput
+                name='edit_name'
+                title='姓名'
+                type='text'
+                placeholder='姓名'
+                value={editStudent.name}
+                onChange={(v) => setEditStudent(prev => ({ ...prev, name: v }))}
+              />
+              <View
+                className='memphis-picker-row'
+                hoverClass='memphis-picker-row--hover'
+                onClick={() => setEditGroupSheetOpen(true)}
+              >
+                <Text className='memphis-picker-title'>所在团</Text>
+                <Text className='memphis-picker-value'>{editStudent.group_name || '请选择'}</Text>
+              </View>
             </View>
-          </View>
-        </AtModalContent>
-        <AtModalAction>
-          <AtButton type='secondary' onClick={() => setEditModalOpen(false)}>取消</AtButton>
-          <AtButton type='primary' onClick={handleUpdate}>保存</AtButton>
-        </AtModalAction>
-      </AtModal>
+          </AtModalContent>
+          <AtModalAction>
+            <AtButton type='secondary' onClick={() => setEditModalOpen(false)}>取消</AtButton>
+            <AtButton type='primary' onClick={handleUpdate}>保存</AtButton>
+          </AtModalAction>
+        </AtModal>
+      )}
 
       <AtActionSheet
         isOpened={editGroupSheetOpen}

@@ -277,9 +277,8 @@ export default function CourseDetail() {
                     {isChecked ? '已签到' : '未签到'}
                   </AtTag>
                 ) : (
-                  <View style={{ display: 'flex', gap: '18rpx', alignItems: 'center', justifyContent: 'flex-end' }}>
-                    <Text className='memphis-danger' style={{ fontSize: '28rpx', padding: '10rpx' }} onClick={() => handleRemoveStudent(s.id)}>移除</Text>
-                    <Text className='memphis-danger' style={{ fontSize: '28rpx', padding: '10rpx' }} onClick={() => handleDeleteStudent(s)}>删除</Text>
+                  <View className='memphis-student-actions'>
+                    <View className='memphis-action-btn delete' style={{ padding: '4rpx 16rpx', fontSize: '24rpx' }} onClick={() => handleRemoveStudent(s.id)}>移除</View>
                   </View>
                 )}
               </View>

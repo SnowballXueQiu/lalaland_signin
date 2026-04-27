@@ -487,3 +487,71 @@ page {
 .memphis-course-actions {
   flex: 0 0 auto;
 }
+
+.memphis-student-list {
+  background: transparent;
+}
+
+.memphis-student-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 30rpx;
+  background: #fff;
+  border-top: 2rpx solid rgba(29, 27, 49, 0.08);
+  box-sizing: border-box;
+}
+
+.memphis-student-row:first-child {
+  border-top: 0;
+}
+
+.memphis-student-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding-right: 20rpx;
+}
+
+.memphis-student-name {
+  font-size: 32rpx;
+  font-weight: 900;
+  color: #1d1b31;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memphis-student-no {
+  font-size: 26rpx;
+  color: rgba(29, 27, 49, 0.55);
+  font-weight: 900;
+  margin-top: 6rpx;
+}
+
+.memphis-student-actions {
+  display: flex;
+  gap: 16rpx;
+  flex: 0 0 auto;
+}
+
+.memphis-action-btn {
+  padding: 8rpx 20rpx;
+  font-size: 24rpx;
+  font-weight: 900;
+  border-radius: 8rpx;
+  border: 4rpx solid #1d1b31;
+  box-shadow: 4rpx 4rpx 0 #1d1b31;
+}
+
+.memphis-action-btn.edit {
+  background: #00d8ff;
+  color: #1d1b31;
+}
+
+.memphis-action-btn.delete {
+  background: #ff2d55;
+  color: #fff;
+}
+
