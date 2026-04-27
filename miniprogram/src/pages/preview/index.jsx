@@ -11,7 +11,7 @@ export default function Preview() {
   const courses = useMemo(() => ([
     {
       id: 'c1',
-      name: '合唱排练课（示例）',
+      name: '合唱排练',
       group_name: '少年团',
       teacher: '王老师',
       start_date: '2026-04-01',
@@ -24,7 +24,7 @@ export default function Preview() {
     },
     {
       id: 'c2',
-      name: '童声团基础课（示例）',
+      name: '童声团排练',
       group_name: '童声3团',
       teacher: '李老师',
       start_date: '2026-03-15',
@@ -65,7 +65,7 @@ export default function Preview() {
       </View>
 
       <View className='card'>
-        <Text className='card-title'>课程列表（示例）</Text>
+        <Text className='card-title'>排练列表（示例）</Text>
         <View className='memphis-course-list'>
           {courses.map(c => (
             <View
@@ -80,7 +80,7 @@ export default function Preview() {
                 <View className='memphis-course-top'>
                   <Text className='memphis-course-title'>{c.name}</Text>
                 </View>
-                <Text className='memphis-course-note'>团: {c.group_name} | 老师: {c.teacher || '无'} | 课时: {c.total_lessons}</Text>
+                <Text className='memphis-course-note'>团: {c.group_name} | 指挥: {c.teacher || '无'} | 课时: {c.total_lessons}</Text>
               </View>
               <View className='memphis-course-actions'>
                 <AtButton size='small' type='secondary'>查看</AtButton>
@@ -117,7 +117,7 @@ export default function Preview() {
                 <Text className='memphis-kpi-value'>{selectedCourse.group_name}</Text>
               </View>
               <View className='memphis-kpi-item'>
-                <Text className='memphis-kpi-label'>老师</Text>
+                <Text className='memphis-kpi-label'>指挥</Text>
                 <Text className='memphis-kpi-value'>{selectedCourse.teacher || '无'}</Text>
               </View>
               <View className='memphis-kpi-item'>

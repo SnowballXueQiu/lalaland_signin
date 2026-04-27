@@ -105,6 +105,16 @@ class LoginRequest(BaseModel):
 class AdminPasswordLoginRequest(BaseModel):
     password: str
 
+class GroupCreate(BaseModel):
+    name: str
+
+class GroupUpdate(BaseModel):
+    id: int
+    name: str
+
+class GroupDelete(BaseModel):
+    id: int
+
 # --- Auth APIs ---
 @app.post("/auth/login")
 async def wechat_login(req: LoginRequest):
@@ -266,6 +276,85 @@ def delete_course(payload: CourseDelete):
     except HTTPException:
         conn.rollback()
         raise
+    finally:
+        conn.close()
+
+# --- Group APIs ---
+@app.get("/group/list")
+def list_groups(include_inactive: bool = False):
+    conn = get_db()
+    cursor = conn.cursor()
+    if include_inactive:
+        cursor.execute("SELECT id, name, is_active, sort_order FROM group_list ORDER BY sort_order ASC, name ASC")
+    else:
+        cursor.execute("SELECT id, name, is_active, sort_order FROM group_list WHERE is_active = 1 ORDER BY sort_order ASC, name ASC")
+    groups = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return groups
+
+@app.post("/group/create")
+def create_group(payload: GroupCreate):
+    name = (payload.name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Group name required")
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO group_list (name, is_active, sort_order) VALUES (?, 1, 0)", (name,))
+        conn.commit()
+        return {"id": cursor.lastrowid, "message": "Group created successfully"}
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=400, detail="Group name already exists")
+    finally:
+        conn.close()
+
+@app.post("/group/update")
+def update_group(payload: GroupUpdate):
+    name = (payload.name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Group name required")
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT name FROM group_list WHERE id = ?", (payload.id,))
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Group not found")
+        old_name = row["name"]
+        conn.execute("BEGIN")
+        cursor.execute("UPDATE group_list SET name = ? WHERE id = ?", (name, payload.id))
+        cursor.execute("UPDATE student SET group_name = ? WHERE group_name = ?", (name, old_name))
+        cursor.execute("UPDATE course SET group_name = ? WHERE group_name = ?", (name, old_name))
+        conn.commit()
+        return {"message": "Group updated successfully"}
+    except sqlite3.IntegrityError:
+        conn.rollback()
+        raise HTTPException(status_code=400, detail="Group name already exists")
+    except HTTPException:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+@app.post("/group/delete")
+def delete_group(payload: GroupDelete):
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT name FROM group_list WHERE id = ? AND is_active = 1", (payload.id,))
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Group not found")
+        name = row["name"]
+        cursor.execute("SELECT COUNT(1) as cnt FROM student WHERE group_name = ?", (name,))
+        student_cnt = int(cursor.fetchone()["cnt"])
+        cursor.execute("SELECT COUNT(1) as cnt FROM course WHERE group_name = ?", (name,))
+        course_cnt = int(cursor.fetchone()["cnt"])
+        if student_cnt > 0 or course_cnt > 0:
+            raise HTTPException(status_code=400, detail="Group is in use")
+        cursor.execute("UPDATE group_list SET is_active = 0 WHERE id = ?", (payload.id,))
+        conn.commit()
+        return {"message": "Group deleted successfully"}
     finally:
         conn.close()
 

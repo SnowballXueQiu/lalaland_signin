@@ -4,10 +4,9 @@ import { AtInput, AtButton, AtList, AtListItem, AtAccordion, AtActionSheet, AtAc
 import Taro, { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { request } from '../../../utils/api'
 
-const GROUPS = ['少年团', '女声团', '混声团', 'Dreamers', '童声2团', '童声3团', '启蒙1团', '启蒙2团', '启蒙3团', '启蒙4团', '启蒙5团', '启蒙6团']
-
 export default function StudentManage() {
   const [students, setStudents] = useState([])
+  const [groupNames, setGroupNames] = useState([])
   const [newStudent, setNewStudent] = useState({ student_no: '', name: '', group_name: '' })
   const [openGroups, setOpenGroups] = useState({})
   const [groupSheetOpen, setGroupSheetOpen] = useState(false)
@@ -37,30 +36,39 @@ export default function StudentManage() {
     }
   }
 
+  const fetchGroups = async () => {
+    try {
+      const data = await request('/group/list')
+      setGroupNames((data || []).map(g => g.name))
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   useEffect(() => {
     fetchStudents()
+    fetchGroups()
   }, [])
 
   const groupedStudents = useMemo(() => {
-    const groups = {}
-    // To ensure standard order, pre-initialize arrays for standard GROUPS
-    GROUPS.forEach(g => groups[g] = [])
+    const grouped = {}
+    groupNames.forEach(g => (grouped[g] = []))
     
     students.forEach(s => {
       const group = s.group_name || '未分组'
-      if (!groups[group]) groups[group] = []
-      groups[group].push(s)
+      if (!grouped[group]) grouped[group] = []
+      grouped[group].push(s)
     })
     
     // Filter out empty groups
     const result = {}
-    Object.keys(groups).forEach(k => {
-      if (groups[k].length > 0) {
-        result[k] = groups[k]
+    Object.keys(grouped).forEach(k => {
+      if (grouped[k].length > 0) {
+        result[k] = grouped[k]
       }
     })
     return result
-  }, [students])
+  }, [students, groupNames])
 
   const handleCreate = async () => {
     if (!newStudent.student_no || !newStudent.name) {
@@ -179,7 +187,7 @@ export default function StudentManage() {
         onClose={() => setGroupSheetOpen(false)}
         onCancel={() => setGroupSheetOpen(false)}
       >
-        {GROUPS.map(g => (
+        {groupNames.map(g => (
           <AtActionSheetItem
             key={g}
             onClick={() => {
@@ -276,7 +284,7 @@ export default function StudentManage() {
         onClose={() => setEditGroupSheetOpen(false)}
         onCancel={() => setEditGroupSheetOpen(false)}
       >
-        {GROUPS.map(g => (
+        {groupNames.map(g => (
           <AtActionSheetItem
             key={g}
             onClick={() => {

@@ -4,10 +4,9 @@ import { AtInput, AtButton, AtActionSheet, AtActionSheetItem, AtCalendar } from 
 import Taro, { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { request } from '../../../utils/api'
 
-const GROUPS = ['少年团', '女声团', '混声团', 'Dreamers', '童声2团', '童声3团', '启蒙1团', '启蒙2团', '启蒙3团', '启蒙4团', '启蒙5团', '启蒙6团']
-
 export default function CourseManage() {
   const [courses, setCourses] = useState([])
+  const [groupNames, setGroupNames] = useState([])
   const [newCourse, setNewCourse] = useState({ name: '', group_name: '', teacher: '', start_date: '', total_lessons: '20' })
   const [groupSheetOpen, setGroupSheetOpen] = useState(false)
   const [dateSheetOpen, setDateSheetOpen] = useState(false)
@@ -34,8 +33,18 @@ export default function CourseManage() {
     }
   }
 
+  const fetchGroups = async () => {
+    try {
+      const data = await request('/group/list')
+      setGroupNames((data || []).map(g => g.name))
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   useEffect(() => {
     fetchCourses()
+    fetchGroups()
   }, [])
 
   const handleCreate = async () => {
@@ -138,7 +147,7 @@ export default function CourseManage() {
         onClose={() => setGroupSheetOpen(false)}
         onCancel={() => setGroupSheetOpen(false)}
       >
-        {GROUPS.map(g => (
+        {groupNames.map(g => (
           <AtActionSheetItem
             key={g}
             onClick={() => {

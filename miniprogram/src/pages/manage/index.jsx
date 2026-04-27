@@ -31,6 +31,12 @@ export default function ManageIndex() {
             iconInfo={{ size: 20, color: '#19be6b', value: 'calendar' }}
             onClick={() => Taro.navigateTo({ url: '/pages/manage/course/index' })}
           />
+          <AtListItem
+            title='团管理'
+            arrow='right'
+            iconInfo={{ size: 20, color: '#ff5ca8', value: 'list' }}
+            onClick={() => Taro.navigateTo({ url: '/pages/manage/group/index' })}
+          />
         </AtList>
       </View>
     </View>

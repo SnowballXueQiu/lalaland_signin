@@ -27,6 +27,57 @@ def init_db():
     else:
         print("Database already initialized, skipping init.sql")
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS group_list (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            is_active INTEGER NOT NULL DEFAULT 1,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+    """)
+
+    try:
+        cursor.execute("SELECT COUNT(1) as cnt FROM group_list")
+        cnt = int(cursor.fetchone()["cnt"])
+    except Exception:
+        cnt = 0
+
+    if cnt == 0:
+        groups = set()
+        try:
+            cursor.execute("SELECT DISTINCT group_name FROM student WHERE group_name IS NOT NULL AND TRIM(group_name) <> ''")
+            groups |= {row["group_name"] for row in cursor.fetchall() if row["group_name"]}
+        except Exception:
+            pass
+        try:
+            cursor.execute("SELECT DISTINCT group_name FROM course WHERE group_name IS NOT NULL AND TRIM(group_name) <> ''")
+            groups |= {row["group_name"] for row in cursor.fetchall() if row["group_name"]}
+        except Exception:
+            pass
+
+        if not groups:
+            groups = {
+                "少年团",
+                "女声团",
+                "混声团",
+                "Dreamers",
+                "童声2团",
+                "童声3团",
+                "启蒙1团",
+                "启蒙2团",
+                "启蒙3团",
+                "启蒙4团",
+                "启蒙5团",
+                "启蒙6团",
+            }
+
+        for g in sorted(groups):
+            cursor.execute(
+                "INSERT INTO group_list (name, is_active, sort_order) VALUES (?, 1, 0) ON CONFLICT(name) DO NOTHING",
+                (g,),
+            )
+
     conn.commit()
     conn.close()
 

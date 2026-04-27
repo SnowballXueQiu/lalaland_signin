@@ -6,6 +6,7 @@ export default defineAppConfig({
     'pages/manage/student/index',
     'pages/manage/course/index',
     'pages/manage/course/detail',
+    'pages/manage/group/index',
     'pages/parent/index'
   ],
   lazyCodeLoading: 'requiredComponents',
