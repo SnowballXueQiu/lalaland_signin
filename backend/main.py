@@ -11,6 +11,7 @@ import re
 from datetime import date
 from database import get_db, init_db
 from contextlib import asynccontextmanager
+from export import router as export_router
 
 WX_APPID = os.getenv("WX_APPID", "")
 WX_SECRET = os.getenv("WX_SECRET", "")
@@ -46,6 +47,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="La La Land Signin API", lifespan=lifespan)
+app.include_router(export_router)
 
 app.add_middleware(
     CORSMiddleware,

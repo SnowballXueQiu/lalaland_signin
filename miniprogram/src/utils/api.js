@@ -2,6 +2,8 @@ import Taro from '@tarojs/taro'
 
 const BASE_URL = 'https://s1.imlihe.com/lalaland'
 
+export const getBaseUrl = () => BASE_URL
+
 export const request = async (url, method = 'GET', data = {}) => {
   try {
     const res = await Taro.request({
