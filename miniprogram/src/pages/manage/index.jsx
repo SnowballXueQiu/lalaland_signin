@@ -53,24 +53,28 @@ export default function ManageIndex() {
         <AtList hasBorder={false}>
           <AtListItem
             title='快捷签到'
+            note='快速进入课程签到模式'
             arrow='right'
             iconInfo={{ size: 20, color: '#ff5ca8', value: 'check-circle' }}
             onClick={() => Taro.navigateTo({ url: '/pages/manage/checkin/index' })}
           />
           <AtListItem
             title='学生管理'
+            note='新增、编辑和删除学生'
             arrow='right'
             iconInfo={{ size: 20, color: '#2d8cf0', value: 'user' }}
             onClick={() => Taro.navigateTo({ url: '/pages/manage/student/index' })}
           />
           <AtListItem
             title='课程管理'
+            note='管理课程、学生与签到'
             arrow='right'
             iconInfo={{ size: 20, color: '#19be6b', value: 'calendar' }}
             onClick={() => Taro.navigateTo({ url: '/pages/manage/course/index' })}
           />
           <AtListItem
             title='团管理'
+            note='维护团名称和分组列表'
             arrow='right'
             iconInfo={{ size: 20, color: '#8a2be2', value: 'list' }}
             onClick={() => Taro.navigateTo({ url: '/pages/manage/group/index' })}
