@@ -130,6 +130,28 @@ export default function CourseDetail() {
     })
   }
 
+  const handleDeleteStudent = async (student) => {
+    Taro.showModal({
+      title: '删除学生（不可恢复）',
+      content: `将删除「${student.name}(${student.student_no})」的学生信息，并从所有课程中移除，同时删除签到记录与家长绑定。确定继续？`,
+      confirmText: '删除',
+      cancelText: '取消',
+      success: async (res) => {
+        if (!res.confirm) return
+        try {
+          await request('/student/delete', 'POST', { student_id: student.id })
+          Taro.showToast({ title: '已删除', icon: 'success' })
+          fetchCourseDetail(courseId)
+          fetchAllStudents()
+          fetchAttendanceList(courseId, attendDate)
+        } catch (e) {
+          console.error(e)
+          Taro.showToast({ title: '删除失败', icon: 'none' })
+        }
+      }
+    })
+  }
+
   const toggleAttendance = async (studentId, isChecked) => {
     try {
       if (isChecked) {
@@ -255,7 +277,10 @@ export default function CourseDetail() {
                     {isChecked ? '已签到' : '未签到'}
                   </AtTag>
                 ) : (
-                  <Text className='memphis-danger' style={{ fontSize: '28rpx', padding: '10rpx' }} onClick={() => handleRemoveStudent(s.id)}>移除</Text>
+                  <View style={{ display: 'flex', gap: '18rpx', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    <Text className='memphis-danger' style={{ fontSize: '28rpx', padding: '10rpx' }} onClick={() => handleRemoveStudent(s.id)}>移除</Text>
+                    <Text className='memphis-danger' style={{ fontSize: '28rpx', padding: '10rpx' }} onClick={() => handleDeleteStudent(s)}>删除</Text>
+                  </View>
                 )}
               </View>
             </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text } from '@tarojs/components'
+import { View, Text, ScrollView } from '@tarojs/components'
 import { AtInput, AtButton, AtActionSheet, AtActionSheetItem, AtCalendar } from 'taro-ui'
 import Taro, { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { request } from '../../../utils/api'
@@ -147,17 +147,19 @@ export default function CourseManage() {
         onClose={() => setGroupSheetOpen(false)}
         onCancel={() => setGroupSheetOpen(false)}
       >
-        {groupNames.map(g => (
-          <AtActionSheetItem
-            key={g}
-            onClick={() => {
-              setNewCourse(prev => ({ ...prev, group_name: g }))
-              setGroupSheetOpen(false)
-            }}
-          >
-            {g}
-          </AtActionSheetItem>
-        ))}
+        <ScrollView scrollY style={{ maxHeight: '900rpx' }}>
+          {groupNames.map(g => (
+            <AtActionSheetItem
+              key={g}
+              onClick={() => {
+                setNewCourse(prev => ({ ...prev, group_name: g }))
+                setGroupSheetOpen(false)
+              }}
+            >
+              {g}
+            </AtActionSheetItem>
+          ))}
+        </ScrollView>
       </AtActionSheet>
 
       <AtActionSheet

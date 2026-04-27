@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { View, Text } from '@tarojs/components'
+import { View, Text, ScrollView } from '@tarojs/components'
 import { AtInput, AtButton, AtList, AtListItem, AtAccordion, AtActionSheet, AtActionSheetItem, AtSwipeAction, AtModal, AtModalHeader, AtModalContent, AtModalAction } from 'taro-ui'
 import Taro, { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { request } from '../../../utils/api'
@@ -187,17 +187,19 @@ export default function StudentManage() {
         onClose={() => setGroupSheetOpen(false)}
         onCancel={() => setGroupSheetOpen(false)}
       >
-        {groupNames.map(g => (
-          <AtActionSheetItem
-            key={g}
-            onClick={() => {
-              setNewStudent(prev => ({ ...prev, group_name: g }))
-              setGroupSheetOpen(false)
-            }}
-          >
-            {g}
-          </AtActionSheetItem>
-        ))}
+        <ScrollView scrollY style={{ maxHeight: '900rpx' }}>
+          {groupNames.map(g => (
+            <AtActionSheetItem
+              key={g}
+              onClick={() => {
+                setNewStudent(prev => ({ ...prev, group_name: g }))
+                setGroupSheetOpen(false)
+              }}
+            >
+              {g}
+            </AtActionSheetItem>
+          ))}
+        </ScrollView>
       </AtActionSheet>
 
       <View className='card' style={{ paddingBottom: '20px' }}>
@@ -284,17 +286,19 @@ export default function StudentManage() {
         onClose={() => setEditGroupSheetOpen(false)}
         onCancel={() => setEditGroupSheetOpen(false)}
       >
-        {groupNames.map(g => (
-          <AtActionSheetItem
-            key={g}
-            onClick={() => {
-              setEditStudent(prev => ({ ...prev, group_name: g }))
-              setEditGroupSheetOpen(false)
-            }}
-          >
-            {g}
-          </AtActionSheetItem>
-        ))}
+        <ScrollView scrollY style={{ maxHeight: '900rpx' }}>
+          {groupNames.map(g => (
+            <AtActionSheetItem
+              key={g}
+              onClick={() => {
+                setEditStudent(prev => ({ ...prev, group_name: g }))
+                setEditGroupSheetOpen(false)
+              }}
+            >
+              {g}
+            </AtActionSheetItem>
+          ))}
+        </ScrollView>
       </AtActionSheet>
     </View>
   )

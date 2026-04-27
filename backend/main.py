@@ -156,7 +156,8 @@ async def wechat_login(req: LoginRequest):
 
 @app.post("/auth/admin_password_login")
 def admin_password_login(req: AdminPasswordLoginRequest):
-    if not ADMIN_PASSWORD or not secrets.compare_digest(req.password, ADMIN_PASSWORD):
+    pwd = (req.password or "")
+    if not ADMIN_PASSWORD or not secrets.compare_digest(pwd.encode("utf-8"), ADMIN_PASSWORD.encode("utf-8")):
         raise HTTPException(status_code=401, detail="Invalid password")
 
     openid = "super_admin"
