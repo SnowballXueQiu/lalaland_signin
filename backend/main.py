@@ -568,6 +568,35 @@ def unbind_parent(data: ParentUnbind):
     finally:
         conn.close()
 
+@app.get("/parent/attendance")
+def parent_student_attendance(openid: str, student_id: int, course_id: int):
+    """获取某家长绑定的学生在某课程的签到日期列表"""
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Verify parent exists and is bound to this student
+    cursor.execute("SELECT id FROM parent WHERE openid = ?", (openid,))
+    parent = cursor.fetchone()
+    if not parent:
+        conn.close()
+        raise HTTPException(status_code=403, detail="Parent not found")
+
+    cursor.execute(
+        "SELECT 1 FROM parent_student WHERE parent_id = ? AND student_id = ?",
+        (parent['id'], student_id)
+    )
+    if not cursor.fetchone():
+        conn.close()
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    cursor.execute(
+        "SELECT attend_date FROM attendance WHERE student_id = ? AND course_id = ? ORDER BY attend_date ASC",
+        (student_id, course_id)
+    )
+    dates = [row['attend_date'] for row in cursor.fetchall()]
+    conn.close()
+    return {"dates": dates}
+
 @app.get("/parent/children")
 def parent_children(openid: str):
     conn = get_db()
@@ -591,7 +620,7 @@ def parent_children(openid: str):
     
     for child in children:
         cursor.execute('''
-            SELECT c.name as course_name, c.total_lessons, e.used_lessons, 
+            SELECT c.id as course_id, c.name as course_name, c.total_lessons, e.used_lessons, 
                    (c.total_lessons - e.used_lessons) as remaining_lessons
             FROM enrollment e
             JOIN course c ON e.course_id = c.id

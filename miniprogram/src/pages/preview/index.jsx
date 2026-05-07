@@ -17,9 +17,9 @@ export default function Preview() {
       start_date: '2026-04-01',
       total_lessons: 20,
       students: [
-        { id: 's1', student_no: '240159', name: '示例同学A', used_lessons: 3 },
-        { id: 's2', student_no: '240003', name: '示例同学B', used_lessons: 5 },
-        { id: 's3', student_no: '250275', name: '示例同学C', used_lessons: 2 }
+        { id: 's1', student_no: '240159', name: '示例团员A', used_lessons: 3 },
+        { id: 's2', student_no: '240003', name: '示例团员B', used_lessons: 5 },
+        { id: 's3', student_no: '250275', name: '示例团员C', used_lessons: 2 }
       ]
     },
     {
@@ -30,8 +30,8 @@ export default function Preview() {
       start_date: '2026-03-15',
       total_lessons: 16,
       students: [
-        { id: 's4', student_no: '250416', name: '示例同学D', used_lessons: 4 },
-        { id: 's5', student_no: '250448', name: '示例同学E', used_lessons: 1 }
+        { id: 's4', student_no: '250416', name: '示例团员D', used_lessons: 4 },
+        { id: 's5', student_no: '250448', name: '示例团员E', used_lessons: 1 }
       ]
     }
   ]), [])
@@ -79,7 +79,7 @@ export default function Preview() {
                 <View className='memphis-course-top'>
                   <Text className='memphis-course-title'>{c.name}</Text>
                 </View>
-                <Text className='memphis-course-note'>团: {c.group_name} | 指挥: {c.teacher || '无'} | 课时: {c.total_lessons}</Text>
+                <Text className='memphis-course-note'>团: {c.group_name} | 指挥: {c.teacher || '无'} | 排练次数: {c.total_lessons}</Text>
               </View>
               <View className='memphis-course-actions'>
                 <AtButton size='small' type='secondary'>查看</AtButton>
@@ -97,7 +97,7 @@ export default function Preview() {
 
       <AtActionSheet
         isOpened={detailOpen}
-        title='课程详情（预览）'
+        title='排练详情（预览）'
         cancelText='关闭'
         onClose={() => setDetailOpen(false)}
         onCancel={() => setDetailOpen(false)}
@@ -107,7 +107,7 @@ export default function Preview() {
             <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '0 30rpx', marginBottom: '20rpx' }}>
               <Text className='card-title' style={{ padding: 0, marginBottom: 0 }}>基本信息</Text>
               <Text style={{ fontSize: '26rpx', fontWeight: 900, color: 'rgba(29,27,49,0.55)' }}>
-                开课：{selectedCourse.start_date || '未设置'}
+                起始日期：{selectedCourse.start_date || '未设置'}
               </Text>
             </View>
             <View className='memphis-kpi'>
@@ -120,7 +120,7 @@ export default function Preview() {
                 <Text className='memphis-kpi-value'>{selectedCourse.teacher || '无'}</Text>
               </View>
               <View className='memphis-kpi-item'>
-                <Text className='memphis-kpi-label'>总课时</Text>
+                <Text className='memphis-kpi-label'>总排练次数</Text>
                 <Text className='memphis-kpi-value'>{selectedCourse.total_lessons}</Text>
               </View>
             </View>
@@ -128,7 +128,7 @@ export default function Preview() {
 
           <View className='card' style={{ marginTop: '20rpx' }}>
             <View className='memphis-row'>
-              <Text style={{ fontSize: '32rpx', fontWeight: 900, color: '#1d1b31' }}>学生名单 ({selectedCourse.students.length}人)</Text>
+              <Text style={{ fontSize: '32rpx', fontWeight: 900, color: '#1d1b31' }}>团员名单 ({selectedCourse.students.length}人)</Text>
               <AtTag type='primary' active>预览</AtTag>
             </View>
             {selectedCourse.students.map(s => (
