@@ -12,8 +12,8 @@ export default function ParentIndex() {
   const [displayMode, setDisplayMode] = useState('remaining')
   const [attendanceModal, setAttendanceModal] = useState({ visible: false, dates: [], courseName: '' })
 
-  useShareAppMessage(() => ({ title: '合唱团家长端', path: '/pages/index/index' }))
-  useShareTimeline(() => ({ title: '合唱团家长端' }))
+  useShareAppMessage(() => ({ title: '合唱团团员端', path: '/pages/index/index' }))
+  useShareTimeline(() => ({ title: '合唱团团员端' }))
 
   useEffect(() => {
     const storedOpenid = Taro.getStorageSync('openid')
@@ -125,7 +125,7 @@ export default function ParentIndex() {
   return (
     <ScrollView scrollY className='container' style={{ height: '100vh' }}>
       <View className='header'>
-        <Text className='title'>家长端</Text>
+        <Text className='title'>团员端</Text>
       </View>
 
       {/* 绑定团员 */}
