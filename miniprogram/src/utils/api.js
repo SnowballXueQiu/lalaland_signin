@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro'
 
-const BASE_URL = 'https://s1.imlihe.com/lalaland'
+const BASE_URL = 'https://s1.eke.vin/lalaland'
 
 export const getBaseUrl = () => BASE_URL
 
