@@ -260,11 +260,19 @@ export default function CourseDetail() {
         {course.students.map(s => {
           const isChecked = checkedStudentIds.includes(s.id)
           const remaining = course.total_lessons - s.used_lessons
+          const shouldHighlightName = course.group_name?.startsWith('启蒙') && s.used_lessons >= 18
           return (
             <View key={s.id} className='memphis-row memphis-divider'>
               <View>
                 <View>
-                  <Text style={{ fontWeight: 900, fontSize: '30rpx', color: '#1d1b31' }}>{s.name}</Text>
+                  <Text style={{
+                    fontWeight: 900,
+                    fontSize: '30rpx',
+                    color: '#1d1b31',
+                    background: shouldHighlightName ? '#ffd640' : 'transparent',
+                    padding: shouldHighlightName ? '4rpx 10rpx' : 0,
+                    borderRadius: shouldHighlightName ? '6rpx' : 0
+                  }}>{s.name}</Text>
                   <Text style={{ fontSize: '26rpx', color: 'rgba(29,27,49,0.55)', marginLeft: '10rpx' }}>({s.student_no})</Text>
                 </View>
                 <View style={{ fontSize: '24rpx', color: 'rgba(29,27,49,0.72)', marginTop: '10rpx' }}>
