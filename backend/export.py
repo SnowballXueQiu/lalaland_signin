@@ -61,8 +61,10 @@ def export_excel():
     student_count = int(cursor.fetchone()["cnt"])
     cursor.execute("SELECT COUNT(1) AS cnt FROM course")
     course_count = int(cursor.fetchone()["cnt"])
-    cursor.execute("SELECT COUNT(1) AS cnt FROM attendance")
+    cursor.execute("SELECT COALESCE(SUM(used_lessons), 0) AS cnt FROM enrollment")
     attendance_count = int(cursor.fetchone()["cnt"])
+    cursor.execute("SELECT COUNT(1) AS cnt FROM attendance")
+    attendance_record_count = int(cursor.fetchone()["cnt"])
     cursor.execute("SELECT COUNT(1) AS cnt FROM group_list WHERE is_active = 1")
     group_count = int(cursor.fetchone()["cnt"])
     cursor.execute("SELECT COUNT(1) AS cnt FROM enrollment")
@@ -86,7 +88,8 @@ def export_excel():
         ("课程总数", course_count, "当前系统内课程数量"),
         ("团总数", group_count, "当前启用的团数量"),
         ("报名总数", enrollment_count, "所有课程报名关系总数"),
-        ("签到总次数", attendance_count, "所有签到记录累计条数"),
+        ("签到总次数", attendance_count, "所有课程已签到次数累计"),
+        ("签到明细记录数", attendance_record_count, "系统中带日期的签到记录条数"),
         ("签到日期总数", attendance_day_count, "去重后的签到日期总数"),
         (
             "签到时间范围",
@@ -147,14 +150,14 @@ def export_excel():
         ws_groups.append([row["name"]])
     auto_adjust_columns(ws_groups)
 
-    cursor.execute("SELECT id, name FROM course ORDER BY id")
+    cursor.execute("SELECT id, name, total_lessons FROM course ORDER BY id")
     all_courses = [dict(row) for row in cursor.fetchall()]
     for course in all_courses:
         ws_course = workbook.create_sheet(sanitize_sheet_name(course["name"], sheet_names))
 
         cursor.execute(
             """
-            SELECT s.id, s.student_no, s.name
+            SELECT s.id, s.student_no, s.name, e.used_lessons
             FROM enrollment e
             JOIN student s ON s.id = e.student_id
             WHERE e.course_id = ?
@@ -175,7 +178,7 @@ def export_excel():
         )
         dates = [row["attend_date"] for row in cursor.fetchall()]
 
-        headers = ["学号", "姓名"] + dates
+        headers = ["学号", "姓名", "已签到次数", "剩余次数"] + dates
         ws_course.append(headers)
         style_header(ws_course)
 
@@ -192,7 +195,12 @@ def export_excel():
             attendance_lookup = {(row["student_id"], row["attend_date"]) for row in cursor.fetchall()}
 
         for student in students:
-            row = [student["student_no"], student["name"]]
+            row = [
+                student["student_no"],
+                student["name"],
+                student["used_lessons"],
+                course["total_lessons"] - student["used_lessons"],
+            ]
             for attend_date in dates:
                 row.append("√" if (student["id"], attend_date) in attendance_lookup else "")
             ws_course.append(row)

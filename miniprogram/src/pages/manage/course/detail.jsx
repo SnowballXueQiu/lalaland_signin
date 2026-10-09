@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, Switch, ScrollView } from '@tarojs/components'
-import { AtButton, AtTag, AtActionSheet, AtActionSheetItem, AtCalendar, AtCheckbox } from 'taro-ui'
+import { AtButton, AtTag, AtActionSheet, AtCalendar, AtCheckbox } from 'taro-ui'
 import Taro, { getCurrentInstance, useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import { request } from '../../../utils/api'
 
@@ -21,6 +21,7 @@ export default function CourseDetail() {
   
   const [attendanceList, setAttendanceList] = useState([])
   const [attendDateOpen, setAttendDateOpen] = useState(false)
+  const [pendingAttendanceIds, setPendingAttendanceIds] = useState([])
 
   useShareAppMessage(() => {
     return {
@@ -74,7 +75,6 @@ export default function CourseDetail() {
       setCourseId(id)
       fetchCourseDetail(id)
       fetchAllStudents()
-      fetchAttendanceList(id, attendDate)
     }
   }, [])
   
@@ -134,29 +134,9 @@ export default function CourseDetail() {
     })
   }
 
-  const handleDeleteStudent = async (student) => {
-    Taro.showModal({
-      title: '删除学生（不可恢复）',
-      content: `将删除「${student.name}(${student.student_no})」的学生信息，并从所有课程中移除，同时删除签到记录与家长绑定。确定继续？`,
-      confirmText: '删除',
-      cancelText: '取消',
-      success: async (res) => {
-        if (!res.confirm) return
-        try {
-          await request('/student/delete', 'POST', { student_id: student.id })
-          Taro.showToast({ title: '已删除', icon: 'success' })
-          fetchCourseDetail(courseId)
-          fetchAllStudents()
-          fetchAttendanceList(courseId, attendDate)
-        } catch (e) {
-          console.error(e)
-          Taro.showToast({ title: '删除失败', icon: 'none' })
-        }
-      }
-    })
-  }
-
   const toggleAttendance = async (studentId, isChecked) => {
+    if (pendingAttendanceIds.includes(studentId)) return
+    setPendingAttendanceIds(prev => [...prev, studentId])
     try {
       if (isChecked) {
         await request('/attendance/checkin', 'POST', {
@@ -171,12 +151,15 @@ export default function CourseDetail() {
           attend_date: attendDate
         })
       }
-      // Refresh course detail for updated used_lessons and attendance list
-      fetchCourseDetail(courseId)
-      fetchAttendanceList(courseId, attendDate)
+      await Promise.all([
+        fetchCourseDetail(courseId),
+        fetchAttendanceList(courseId, attendDate)
+      ])
       Taro.showToast({ title: '操作成功', icon: 'success' })
     } catch (e) {
       console.error(e)
+    } finally {
+      setPendingAttendanceIds(prev => prev.filter(id => id !== studentId))
     }
   }
 
@@ -259,6 +242,7 @@ export default function CourseDetail() {
         
         {course.students.map(s => {
           const isChecked = checkedStudentIds.includes(s.id)
+          const isAttendancePending = pendingAttendanceIds.includes(s.id)
           const remaining = course.total_lessons - s.used_lessons
           const shouldHighlightName = course.group_name?.startsWith('启蒙') && s.used_lessons >= 18
           return (
@@ -272,7 +256,8 @@ export default function CourseDetail() {
                     background: shouldHighlightName ? '#ffd640' : 'transparent',
                     padding: shouldHighlightName ? '4rpx 10rpx' : 0,
                     borderRadius: shouldHighlightName ? '6rpx' : 0
-                  }}>{s.name}</Text>
+                  }}
+                  >{s.name}</Text>
                   <Text style={{ fontSize: '26rpx', color: 'rgba(29,27,49,0.55)', marginLeft: '10rpx' }}>({s.student_no})</Text>
                 </View>
                 <View style={{ fontSize: '24rpx', color: 'rgba(29,27,49,0.72)', marginTop: '10rpx' }}>
@@ -281,13 +266,17 @@ export default function CourseDetail() {
               </View>
               <View>
                 {isCheckinMode ? (
-                  <AtTag 
-                    type='primary' 
-                    active={isChecked}
+                  <View
+                    className='memphis-action-btn'
+                    style={{
+                      background: isChecked ? '#ff5ca8' : '#ffd640',
+                      color: '#1d1b31',
+                      opacity: isAttendancePending ? 0.55 : 1
+                    }}
                     onClick={() => toggleAttendance(s.id, !isChecked)}
                   >
-                    {isChecked ? '已签到' : '未签到'}
-                  </AtTag>
+                    {isAttendancePending ? '处理中' : isChecked ? '已签到' : '点击签到'}
+                  </View>
                 ) : (
                   <View className='memphis-student-actions'>
                     <View className='memphis-action-btn delete' style={{ padding: '4rpx 16rpx', fontSize: '24rpx' }} onClick={() => handleRemoveStudent(s.id)}>移除</View>
@@ -325,7 +314,7 @@ export default function CourseDetail() {
       >
         <View style={{ padding: '0 20rpx 10rpx 20rpx' }}>
           <AtCalendar
-            isSwiper={true}
+            isSwiper
             minDate={course.start_date || '1970-01-01'}
             onSelectDate={(e) => {
               const dateStr = e?.value?.start

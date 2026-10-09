@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { View, Text } from '@tarojs/components'
 import { AtList, AtListItem } from 'taro-ui'
 import Taro from '@tarojs/taro'
@@ -19,16 +19,43 @@ export default function ManageIndex() {
     setExporting(true)
     Taro.showLoading({ title: '导出中...' })
     try {
-      const downloadRes = await Taro.downloadFile({
-        url: `${getBaseUrl()}/export/excel`
-      })
-      if (downloadRes.statusCode < 200 || downloadRes.statusCode >= 300) {
-        throw new Error('导出失败')
+      const exportUrl = `${getBaseUrl()}/export/excel`
+      let filePath = ''
+
+      try {
+        const downloadRes = await Taro.downloadFile({ url: exportUrl })
+        if (downloadRes.statusCode >= 200 && downloadRes.statusCode < 300) {
+          filePath = downloadRes.tempFilePath
+        }
+      } catch (downloadError) {
+        console.warn('downloadFile failed, falling back to request', downloadError)
       }
-      const saveRes = await Taro.saveFile({ tempFilePath: downloadRes.tempFilePath })
+
+      if (!filePath) {
+        const response = await Taro.request({
+          url: exportUrl,
+          method: 'GET',
+          responseType: 'arraybuffer'
+        })
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          throw new Error('导出失败')
+        }
+
+        filePath = `${Taro.env.USER_DATA_PATH}/lalaland-export.xlsx`
+        const fileSystem = Taro.getFileSystemManager()
+        await new Promise((resolve, reject) => {
+          fileSystem.writeFile({
+            filePath,
+            data: response.data,
+            success: resolve,
+            fail: reject
+          })
+        })
+      }
+
       Taro.hideLoading()
       await Taro.openDocument({
-        filePath: saveRes.savedFilePath,
+        filePath,
         fileType: 'xlsx',
         showMenu: true
       })
